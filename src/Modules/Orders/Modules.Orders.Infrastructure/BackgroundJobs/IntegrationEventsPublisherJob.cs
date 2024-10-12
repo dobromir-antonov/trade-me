@@ -53,22 +53,22 @@ public sealed class IntegrationEventsPublisherJob(IServiceScopeFactory serviceSc
         var dbContext = scope.ServiceProvider.GetRequiredService<OrdersDbContext>();
         var integrationEventPublisher = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 
-        List<OutboxIntegrationEvent> outboxIntegrationEvents = await dbContext.OutboxIntegrationEvents.ToListAsync(ct);
+        //List<OutboxIntegrationEvent> outboxIntegrationEvents = await dbContext.OutboxIntegrationEvents.ToListAsync(ct);
 
-        if (outboxIntegrationEvents.Count == 0)
-        {
-            return;
-        }
+        //if (outboxIntegrationEvents.Count == 0)
+        //{
+        //    return;
+        //}
 
-        foreach (OutboxIntegrationEvent outboxIntegrationEvent in outboxIntegrationEvents)
-        {
-            IIntegrationEvent integrationEvent = IntegrationEventFactory(outboxIntegrationEvent);
+        //foreach (OutboxIntegrationEvent outboxIntegrationEvent in outboxIntegrationEvents)
+        //{
+        //    IIntegrationEvent integrationEvent = IntegrationEventFactory(outboxIntegrationEvent);
 
-            //TODO: Add polly for retry
-            await integrationEventPublisher.Publish(integrationEvent, integrationEvent.GetType(), ct);
-        }
+        //    //TODO: Add polly for retry
+        //    await integrationEventPublisher.Publish(integrationEvent, integrationEvent.GetType(), ct);
+        //}
 
-        dbContext.RemoveRange(outboxIntegrationEvents);
+        //dbContext.RemoveRange(outboxIntegrationEvents);
         await dbContext.SaveChangesAsync(ct);
     }
 

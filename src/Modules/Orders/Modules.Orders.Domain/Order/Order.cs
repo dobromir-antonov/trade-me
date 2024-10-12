@@ -10,6 +10,9 @@ public class Order : AggregateRoot<OrderId>
     public decimal Price { get; private set; }
     public Guid UserId { get; private set; }
 
+    //EF Core
+    private Order() { }
+
     private Order(OrderId id, string ticker, int quantity, decimal price, Guid userId) : base(id)
     {
         Ticker = ticker;

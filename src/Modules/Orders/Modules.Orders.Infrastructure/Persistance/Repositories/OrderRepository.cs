@@ -2,10 +2,10 @@
 
 namespace Modules.Orders.Infrastructure.Persistance.Repositories;
 
-public class OrderRepository(OrdersDbContext context) : IOrderRepository
+public class OrderRepository : IOrderRepository
 {
     public async Task AddOrderAsync(Order order, CancellationToken cancellationToken = default)
     {
-        await context.AddAsync(order, cancellationToken);
+        //await context.AddAsync(order, cancellationToken);
     }
 }

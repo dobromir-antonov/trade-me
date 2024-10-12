@@ -22,6 +22,7 @@
 	  <ProjectReference Include="..\Modules\Orders\Modules.Orders.Infrastructure\Modules.Orders.Infrastructure.csproj" />
 	  <ProjectReference Include="..\Modules\Portfolio\Modules.Portfolio.Infrastructure\Modules.Portfolio.Infrastructure.csproj" />
 	  <ProjectReference Include="..\Modules\Price\Modules.Price.Infrastructure\Modules.Price.Infrastructure.csproj" />
+	  <ProjectReference Include="..\TradeMe.ServiceDefaults\TradeMe.ServiceDefaults.csproj" />
 	</ItemGroup>
 
 </Project>

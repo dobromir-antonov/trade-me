@@ -3,6 +3,7 @@ using Asp.Versioning.Builder;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Modules.Orders.Application.Tickers.Events;
@@ -38,7 +39,8 @@ public class OrdersModule : IModule
            });
 
         services
-            .AddDbContext<OrdersDbContext>();
+            .AddDbContext<OrdersDbContext>(o => 
+                o.UseNpgsql(configuration.GetConnectionString("trademe-db")));
 
         services
             .AddScoped<IUnitOfWork, OrdersDbContext>();

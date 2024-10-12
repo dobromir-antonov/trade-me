@@ -23,16 +23,19 @@ public sealed class TickerConfiguration : IEntityTypeConfiguration<Ticker>
         builder
            .Property(x => x.Code)
            .HasColumnName("Code")
+           .HasMaxLength(10)
            .IsRequired();
 
         builder
             .Property(x => x.Name)
             .HasColumnName("Name")
+            .HasMaxLength(50)
             .IsRequired();
 
         builder
            .Property(x => x.LastPrice)
            .HasColumnName("LastPrice")
+           .HasPrecision(18, 2)
            .IsRequired();
 
         builder
