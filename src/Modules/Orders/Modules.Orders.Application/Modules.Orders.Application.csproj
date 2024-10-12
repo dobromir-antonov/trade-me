@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Price\Modules.Price.IntegrationEvents\Modules.Price.IntegrationEvents.csproj" />
     <ProjectReference Include="..\Modules.Orders.Domain\Modules.Orders.Domain.csproj" />
   </ItemGroup>
 

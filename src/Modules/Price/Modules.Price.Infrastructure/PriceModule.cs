@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using MassTransit;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Modules.Price.Infrastructure.BackgroundJobs;
@@ -12,10 +13,15 @@ public class PriceModule : IModule
 
     public void AddModule(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddHostedService<TickerPriceChangedPublisherJob>();
+        services.AddSingleton<IPriceGenerator, PriceGenerator>();
+        services.AddHostedService<StockPricesChangedPublisherJob>();
     }
 
     public void UseModule(WebApplication app)
+    {
+    }
+
+    public void ConfigureMassTransit(IBusRegistrationConfigurator bus)
     {
     }
 

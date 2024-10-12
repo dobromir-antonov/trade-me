@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using MassTransit;
+using MassTransit.Configuration;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -9,6 +11,7 @@ public interface IModule
 {
     void AddModule(IServiceCollection services, IConfiguration configuration);
     void UseModule(WebApplication app);
+    void ConfigureMassTransit(IBusRegistrationConfigurator bus);
 
     Assembly GetDomainAssembly();
     Assembly GetApplicationAssembly();

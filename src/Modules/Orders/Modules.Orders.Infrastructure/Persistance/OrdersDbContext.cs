@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Modules.Orders.Domain;
+using Modules.Price.Domain.Tickers;
 using SharedKernel.Application.Abstraction.Data;
 using System.Reflection;
 
@@ -8,6 +9,7 @@ namespace Modules.Orders.Infrastructure.Persistance;
 public class OrdersDbContext(DbContextOptions<OrdersDbContext> options) : DbContext(options), IUnitOfWork
 {
     public DbSet<Order> Orders { get; set; }
+    public DbSet<Ticker> Tickers { get; set; }
     public DbSet<OutboxIntegrationEvent> OutboxIntegrationEvents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -39,7 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modules.Price.Domain", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modules.Price.Infrastructure", "src\Modules\Price\Modules.Price.Infrastructure\Modules.Price.Infrastructure.csproj", "{FB24ED06-5A62-4F2C-8E3C-1CA7E1395CA1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules.Price.IntegrationEvents", "src\Modules\Price\Modules.Price.IntegrationEvents\Modules.Price.IntegrationEvents.csproj", "{51841520-7F5D-440E-AD30-5C8D114CE246}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modules.Price.IntegrationEvents", "src\Modules\Price\Modules.Price.IntegrationEvents\Modules.Price.IntegrationEvents.csproj", "{51841520-7F5D-440E-AD30-5C8D114CE246}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

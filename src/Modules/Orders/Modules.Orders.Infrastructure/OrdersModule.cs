@@ -1,14 +1,19 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.Builder;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Modules.Orders.Application.Tickers.Events;
 using Modules.Orders.Domain;
+using Modules.Orders.Infrastructure.Idempotence;
 using Modules.Orders.Infrastructure.Persistance;
 using Modules.Orders.Infrastructure.Persistance.Repositories;
+using Modules.Price.IntegrationEvents;
 using SharedKernel.Application.Abstraction.Data;
 using SharedKernel.Infrastructure;
+using SharedKernel.Messaging;
 using System.Reflection;
 
 namespace Modules.Orders.Infrastructure;
@@ -40,6 +45,9 @@ public class OrdersModule : IModule
 
         services
             .AddScoped<IOrderRepository, OrderRepository>();
+
+        services
+            .AddScoped<IIntegrationEventHandler<TickerPricesChangedIntegrationEvent>, TickerPricesChangedIntegrationEventHandler>();
     }
 
     public void UseModule(WebApplication app)
@@ -55,6 +63,11 @@ public class OrdersModule : IModule
             .WithApiVersionSet(apiVersionSet);
 
         app.MapEndpoints(Application.AssemblyReference.Assembly, routeGroup);
+    }
+
+    public void ConfigureMassTransit(IBusRegistrationConfigurator bus)
+    {
+        bus.AddConsumer<IdempotentIntegrationEventConsumer<TickerPricesChangedIntegrationEvent>>();
     }
 
     public Assembly GetApplicationAssembly() => Application.AssemblyReference.Assembly;

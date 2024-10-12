@@ -2,22 +2,18 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Modules.Price.Infrastructure.Persistance;
 using Modules.Price.IntegrationEvents;
-using SharedKernel.Messaging;
 
 namespace Modules.Price.Infrastructure.BackgroundJobs
 {
-    public sealed class TickerPriceChangedPublisherJob(IServiceScopeFactory serviceScopeFactory, ILogger<TickerPriceChangedPublisherJob> logger) : IHostedService
+    public sealed class StockPricesChangedPublisherJob(
+        IPriceGenerator priceGenerator,
+        IServiceScopeFactory serviceScopeFactory, 
+        ILogger<StockPricesChangedPublisherJob> logger) : IHostedService
     {
         private Task _job;
         private PeriodicTimer _timer;
-        private const int ExecutionPeriodInSeconds = 1;
-
-        private static readonly string[] Tickers = ["AAPL", "TSLA", "NVDA"];
-
-        private const decimal MIN_PRICE = 10;
-        private const decimal MAX_PRICE = 150;
+        private const int ExecutionPeriodInSeconds = 2;
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -53,15 +49,12 @@ namespace Modules.Price.Infrastructure.BackgroundJobs
         {
             using var scope = serviceScopeFactory.CreateScope();
             var integrationEventPublisher = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
-            var rnd = new Random();
-            var index = rnd.Next(0, Tickers.Length - 1);
-            var ticker = Tickers[index];
-            var price = Math.Round((decimal)(rnd.NextDouble() * (double)(MAX_PRICE - MIN_PRICE)) + MIN_PRICE, 2);
+            var tickerPrices = priceGenerator.GenerateRandomTickerPrices()
+                .Select(tp => new TickerPrice(tp.TickerId, tp.Price))
+                .ToArray();
 
-            await integrationEventPublisher.Publish(new TickerPriceChanged(ticker, price), ct);
+            await integrationEventPublisher.Publish(new TickerPricesChangedIntegrationEvent(tickerPrices), ct);
         }
-
-
 
     }
 }

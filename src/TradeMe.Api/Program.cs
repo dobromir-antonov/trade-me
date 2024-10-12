@@ -20,7 +20,8 @@ var builder = WebApplication.CreateBuilder(args);
 
     builder.Services
         .AddGlobalErrorHandling()
-        .AddSwaggerPackage();
+        .AddSwaggerPackage()
+        .AddMassTransitDependency(modules);
 
     builder.Services.AddCors(options =>
     {

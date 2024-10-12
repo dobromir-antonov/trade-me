@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.Builder;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -61,9 +62,17 @@ public class PortfolioModule : IModule
 
     }
 
+    public void ConfigureMassTransit(IBusRegistrationConfigurator bus)
+    {
+    }
+
+
+
     public Assembly GetApplicationAssembly() => Application.AssemblyReference.Assembly;
 
     public Assembly GetDomainAssembly() => Domain.AssemblyReference.Assembly;
 
     public Assembly GetInfrasturctureAssembly() => Infrastructure.AssemblyReference.Assembly;
+
+  
 }
