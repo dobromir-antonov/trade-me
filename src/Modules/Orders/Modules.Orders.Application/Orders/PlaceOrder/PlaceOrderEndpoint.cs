@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using SharedKernel.Application;
 using SharedKernel.Results;
@@ -13,9 +14,11 @@ internal sealed class PlaceOrderEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder endpoints)
     {
         endpoints
-            .MapPost("place", async (PlaceOrder request, ISender sender, CancellationToken cancellationToken) =>
+            .MapPost("place/{userId:guid}", async (PlaceOrderRequest request, ISender sender, CancellationToken cancellationToken) =>
             {
-                Result<PlaceOrderResponse> result = await sender.Send(request, cancellationToken);
+                Result<PlaceOrderResponse> result = await sender.Send(
+                    new PlaceOrder(request.UserId, request.TickerId, request.Quantity), 
+                    cancellationToken);
 
                 return result.Match(
                     response => Results.Ok(response),

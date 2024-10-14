@@ -13,7 +13,7 @@ namespace Modules.Price.Infrastructure.BackgroundJobs
     {
         private Task _job;
         private PeriodicTimer _timer;
-        private const int ExecutionPeriodInSeconds = 2;
+        private const int ExecutionPeriodInSeconds = 15;
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -50,7 +50,7 @@ namespace Modules.Price.Infrastructure.BackgroundJobs
             using var scope = serviceScopeFactory.CreateScope();
             var integrationEventPublisher = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
             var tickerPrices = priceGenerator.GenerateRandomTickerPrices()
-                .Select(tp => new TickerPrice(tp.TickerId, tp.Price))
+                .Select(tp => new TickerPrice(tp.TickerId, tp.TickerCode, tp.Price))
                 .ToArray();
 
             await integrationEventPublisher.Publish(new TickerPricesChangedIntegrationEvent(tickerPrices), ct);

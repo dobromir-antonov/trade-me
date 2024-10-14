@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Modules.Price.Domain;
-using Modules.Price.Domain.Tickers;
+using Modules.Orders.Domain;
+using Modules.Orders.Domain.Tickers;
 
-namespace Modules.Portfolio.Infrastructure.Persistance.Configurations;
+namespace Modules.Orders.Infrastructure.Persistance.Configurations;
 
 public sealed class TickerConfiguration : IEntityTypeConfiguration<Ticker>
 {
@@ -18,29 +18,23 @@ public sealed class TickerConfiguration : IEntityTypeConfiguration<Ticker>
                 id => id.Value,
                 value => TickerId.Create(value)
             )
-            .HasColumnName("Id");
+            .HasColumnName("id");
 
         builder
            .Property(x => x.Code)
-           .HasColumnName("Code")
+           .HasColumnName("code")
            .HasMaxLength(10)
            .IsRequired();
 
         builder
-            .Property(x => x.Name)
-            .HasColumnName("Name")
-            .HasMaxLength(50)
-            .IsRequired();
-
-        builder
            .Property(x => x.LastPrice)
-           .HasColumnName("LastPrice")
+           .HasColumnName("last_price")
            .HasPrecision(18, 2)
            .IsRequired();
 
         builder
            .Property(x => x.UpdatedOn)
-           .HasColumnName("UpdatedOn")
+           .HasColumnName("updated_on")
            .IsRequired();
     }
 }

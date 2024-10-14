@@ -20,4 +20,10 @@ public sealed class Ticker : AggregateRoot<TickerId>
     {
         return new Ticker(TickerId.CreateNew(), code, name);
     }
+
+    [Obsolete("for seed purpose only")]
+    public static Ticker Create(TickerId id, string code, string name)
+    {
+        return new Ticker(id, code, name);
+    }
 }

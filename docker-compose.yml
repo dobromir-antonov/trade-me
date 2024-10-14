@@ -1,0 +1,57 @@
+services:
+# trade me api
+  trademe.api:
+    image: ${DOCKER_REGISTRY-}trademeapi
+    container_name: trademe.api
+    build:
+      context: .
+      dockerfile: src/TradeMe.Api/Dockerfile
+    ports:
+      - "5000:80" # Expose API on port 5255
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__Postgres=Host=trademe.db;Port=5432;Database=trademe;Username=postgres;Password=postgrespw
+    depends_on:
+      - trademe.db
+    networks:
+      - trademe-network
+
+# postgre
+  trademe.db:
+    image: postgres:15
+    container_name: trademe.db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespw
+      POSTGRES_DB: trademe
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - trademe-network
+
+# pgAdmin service
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: trademe.db.admin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com # Set your default admin email
+      PGADMIN_DEFAULT_PASSWORD: admin        # Set your default admin password
+    ports:
+      - "5050:80" # Expose pgAdmin on port 5266
+    depends_on:
+      - trademe.db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - trademe-network
+
+volumes:
+  postgres_data:
+  pgadmin_data:  
+  
+networks:
+  trademe-network:
+    driver: bridge

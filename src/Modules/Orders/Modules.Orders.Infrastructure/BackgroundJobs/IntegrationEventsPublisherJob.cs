@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Modules.Orders.Domain;
+using Modules.Orders.Domain.Outbox;
 using Modules.Orders.Infrastructure.Persistance;
 using SharedKernel.Messaging;
 

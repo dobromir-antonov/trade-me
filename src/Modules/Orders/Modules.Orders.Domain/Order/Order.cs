@@ -5,7 +5,7 @@ namespace Modules.Orders.Domain;
 
 public class Order : AggregateRoot<OrderId>
 {
-    public string Ticker { get; private set; }  
+    public TickerId TickerId { get; private set; }  
     public int Quantity { get; private set; }
     public decimal Price { get; private set; }
     public Guid UserId { get; private set; }
@@ -13,17 +13,17 @@ public class Order : AggregateRoot<OrderId>
     //EF Core
     private Order() { }
 
-    private Order(OrderId id, string ticker, int quantity, decimal price, Guid userId) : base(id)
+    private Order(OrderId id, TickerId tickerId, int quantity, decimal price, Guid userId) : base(id)
     {
-        Ticker = ticker;
+        TickerId = tickerId;
         Quantity = quantity;
         Price = price;
         UserId = userId;
     }
 
-    public static Order Create(string ticker, int quantity, decimal price, Guid userId)
+    public static Order Create(TickerId tickerId, int quantity, decimal price, Guid userId)
     {
-        var order = new Order(OrderId.CreateNew(), ticker, quantity, price, userId);
+        var order = new Order(OrderId.CreateNew(), tickerId, quantity, price, userId);
 
         order.AddDomainEvent(new OrderPlacedDomainEvent(order.Id));
 

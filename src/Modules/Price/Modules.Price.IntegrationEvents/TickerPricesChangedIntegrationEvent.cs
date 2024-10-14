@@ -10,4 +10,4 @@ public sealed class TickerPricesChangedIntegrationEvent(TickerPrice[] tickers) :
     public TickerPrice[] Tickers { get; } = tickers;
 }
 
-public record TickerPrice(Guid TickerId, decimal Price);
+public record TickerPrice(Guid TickerId, string TickerCode, decimal Price);

@@ -1,4 +1,4 @@
-﻿namespace Modules.Orders.Domain;
+﻿namespace Modules.Orders.Domain.Outbox;
 
 public sealed class OutboxIntegrationEvent(string EventName, string EventContent, DateTime CreatedOn)
 {

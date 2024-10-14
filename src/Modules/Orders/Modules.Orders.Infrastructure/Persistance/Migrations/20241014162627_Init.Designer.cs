@@ -9,10 +9,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Modules.Orders.Infrastructure.Migrations
+namespace Modules.Orders.Infrastructure.Persistance.Migrations
 {
     [DbContext(typeof(OrdersDbContext))]
-    [Migration("20241012202449_Init")]
+    [Migration("20241014162627_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -30,60 +30,65 @@ namespace Modules.Orders.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid")
-                        .HasColumnName("Id");
+                        .HasColumnName("id");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)")
-                        .HasColumnName("Price");
+                        .HasColumnName("price");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer")
-                        .HasColumnName("Quantity");
+                        .HasColumnName("quantity");
 
-                    b.Property<string>("Ticker")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("TickerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ticker_id");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
-                        .HasColumnName("UserId");
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TickerId");
 
                     b.ToTable("orders", "orders");
                 });
 
-            modelBuilder.Entity("Modules.Price.Domain.Tickers.Ticker", b =>
+            modelBuilder.Entity("Modules.Orders.Domain.Tickers.Ticker", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid")
-                        .HasColumnName("Id");
+                        .HasColumnName("id");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)")
-                        .HasColumnName("Code");
+                        .HasColumnName("code");
 
                     b.Property<decimal>("LastPrice")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)")
-                        .HasColumnName("LastPrice");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("Name");
+                        .HasColumnName("last_price");
 
                     b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("UpdatedOn");
+                        .HasColumnName("updated_on");
 
                     b.HasKey("Id");
 
                     b.ToTable("tickers", "orders");
+                });
+
+            modelBuilder.Entity("Modules.Orders.Domain.Order", b =>
+                {
+                    b.HasOne("Modules.Orders.Domain.Tickers.Ticker", null)
+                        .WithMany()
+                        .HasForeignKey("TickerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

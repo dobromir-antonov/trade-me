@@ -6,14 +6,8 @@ using SharedKernel.Infrastructure;
 List<IModule> modules = ModuleHelper.GetModules(AppDomain.CurrentDomain.BaseDirectory);
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.AddServiceDefaults();
 {
     builder.Services.ConfigureOptions<ConfigureSwaggerGenOptions>();
-    builder.Host.UseDefaultServiceProvider(config =>
-    {
-        config.ValidateOnBuild = true;
-    });
 
     foreach (var module in modules)
     {
@@ -39,8 +33,6 @@ builder.AddServiceDefaults();
 
 
 var app = builder.Build();
-
-app.MapDefaultEndpoints();
 {
     app.UseGlobalErrorHandling();
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Modules.Portfolio.Domain;
 using Modules.Portfolio.Domain.UserPortfolios;
-using SharedKernel.Application.Abstraction.Data;
 using System.Reflection;
 
 namespace Modules.Portfolio.Infrastructure.Persistance;

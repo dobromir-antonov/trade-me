@@ -1,27 +1,35 @@
 ﻿using SharedKernel.Domain;
 
-namespace Modules.Price.Domain.Tickers;
+namespace Modules.Orders.Domain.Tickers;
 
 public sealed class Ticker : AggregateRoot<TickerId>
 {
     public string Code { get; private set; }
-    public string Name { get; private set; }
     public decimal LastPrice { get; private set; }
     public DateTime UpdatedOn { get; private set; }
 
     //EF Core
     private Ticker() { }
 
-    private Ticker(TickerId id, string code, string name, decimal lastPrice, DateTime updatedOn) : base(id)
+    private Ticker(TickerId id, string code, decimal lastPrice, DateTime updatedOn) : base(id)
     {
         Code = code;
-        Name = name;
         LastPrice = lastPrice;
         UpdatedOn = updatedOn;
     }
 
-    public static Ticker Create(string code, string name, decimal lastPrice, DateTime updatedOn)
+    public static Ticker Create(TickerId id, string code, decimal lastPrice, DateTime updatedOn)
     {
-        return new Ticker(TickerId.CreateNew(), code, name, lastPrice, updatedOn);
+        var t = new Ticker(id, code, lastPrice, updatedOn);
+        t.AddDomainEvent(new TickerCreated(t.Id));
+
+        return t;
+    }
+
+    public void UpdatePrice(decimal price)
+    {
+        LastPrice = price;
+        UpdatedOn = DateTime.UtcNow;
+        AddDomainEvent(new TickerPriceAdjusted(Id, LastPrice));
     }
 }

@@ -14,7 +14,7 @@
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
-      "httpPort": 54200,
+      "httpPort": 51234,
       "environmentVariables": {
         "ASPNETCORE_HTTP_PORTS": "8080"
       },
