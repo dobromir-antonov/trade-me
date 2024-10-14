@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Lumina.Api.DependencyInjection;
 
@@ -29,6 +30,21 @@ public static class GlobalErrorHandlingDependencyInjection
             if (exception is null)
             {
                 return Results.Problem();
+            }
+
+            if (exception is FluentValidation.ValidationException fluentException)
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "one or more validation errors occurred.",
+                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+                    Extensions =
+                    {
+                        ["errors"] = fluentException.Errors.Select(e => e.ErrorMessage)
+                    }
+                };
+
+                return Results.Problem(problemDetails);
             }
 
             return Results.Problem(detail: exception.Message);

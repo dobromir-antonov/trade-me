@@ -1,4 +1,6 @@
-﻿using Modules.Orders.Domain.ValueObjects;
+﻿using FluentResults;
+using Modules.Orders.Domain.Orders;
+using Modules.Orders.Domain.ValueObjects;
 using SharedKernel.Domain;
 
 namespace Modules.Orders.Domain;
@@ -21,9 +23,19 @@ public class Order : AggregateRoot<OrderId>
         UserId = userId;
     }
 
-    public static Order Create(TickerId tickerId, int quantity, decimal price, Guid userId)
+    public static Result<Order> Create(TickerId tickerId, int quantity, decimal price, Guid userId)
     {
         var order = new Order(OrderId.CreateNew(), tickerId, quantity, price, userId);
+
+        if (order.Price <= 0)
+        { 
+            return OrderErrors.InvalidPrice;
+        }
+
+        if (order.Quantity <= 0)
+        {
+            return OrderErrors.InvalidQuantity;
+        }
 
         order.AddDomainEvent(new OrderPlacedDomainEvent(order.Id));
 

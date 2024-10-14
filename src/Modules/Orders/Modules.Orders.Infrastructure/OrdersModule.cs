@@ -16,6 +16,8 @@ using Modules.Price.IntegrationEvents;
 using SharedKernel.Infrastructure;
 using SharedKernel.Messaging;
 using System.Reflection;
+using FluentValidation;
+using Modules.Orders.Infrastructure.Validation;
 
 namespace Modules.Orders.Infrastructure;
 
@@ -28,6 +30,7 @@ public class OrdersModule : IModule
 
     public void AddModule(IServiceCollection services, IConfiguration configuration)
     {
+        RegisterValidation(services);
         RegisterMediator(services);
         RegisterEndpointVersioning(services);
         RegisterPersistance(services, configuration);
@@ -52,22 +55,31 @@ public class OrdersModule : IModule
 
     private static void RegisterMediator(IServiceCollection services)
     {
-        services.AddMediatR(options => options.RegisterServicesFromAssembly(Application.AssemblyReference.Assembly));
+        services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(Application.AssemblyReference.Assembly);
+            cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+        });
+    }
+
+    private static void RegisterValidation(IServiceCollection services)
+    {
+        services.AddValidatorsFromAssembly(Application.AssemblyReference.Assembly);
     }
 
     private static void RegisterEndpointVersioning(IServiceCollection services)
     {
         services
-         .AddApiVersioning(options =>
-         {
-             options.DefaultApiVersion = new ApiVersion(1);
-             options.ApiVersionReader = new UrlSegmentApiVersionReader();
-         })
-         .AddApiExplorer(options =>
-         {
-             options.GroupNameFormat = "'v'V";
-             options.SubstituteApiVersionInUrl = true;
-         });
+            .AddApiVersioning(options =>
+            {
+                options.DefaultApiVersion = new ApiVersion(1);
+                options.ApiVersionReader = new UrlSegmentApiVersionReader();
+            })
+            .AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'V";
+                options.SubstituteApiVersionInUrl = true;
+            });
 
     }
 

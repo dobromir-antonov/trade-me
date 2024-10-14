@@ -72,7 +72,7 @@ public sealed class IntegrationEventsPublisherJob(IServiceScopeFactory serviceSc
         await dbContext.SaveChangesAsync(ct);
     }
 
-    private IIntegrationEvent IntegrationEventFactory(OutboxIntegrationEvent outbox)
+    private IIntegrationEvent IntegrationEventFactory(OutboxMessage outbox)
     {
         // if (outbox.EventName == typeof(UserCreatedIntegrationEvent).Name) return JsonConvert.DeserializeObject<UserCreatedIntegrationEvent>(outbox.EventContent)!;
 

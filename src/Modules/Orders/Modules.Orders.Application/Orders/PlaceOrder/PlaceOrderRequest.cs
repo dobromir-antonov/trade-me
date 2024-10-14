@@ -1,6 +1,8 @@
-﻿namespace Modules.Orders.Application.Orders.PlaceOrder;
+﻿using Microsoft.AspNetCore.Mvc;
 
-internal sealed record PlaceOrderRequest(Guid UserId, Guid TickerId, int Quantity);
+namespace Modules.Orders.Application.Orders.PlaceOrder;
+
+internal sealed record PlaceOrderRequest(Guid TickerId, int Quantity);
 
 
 

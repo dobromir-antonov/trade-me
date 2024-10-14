@@ -2,7 +2,7 @@
 
 namespace Modules.Orders.Application.Orders.PlaceOrder;
 
-internal sealed record PlaceOrder(Guid UserId, Guid TickerId, int Quantity) : ICommand<PlaceOrderResponse>;
+public sealed record PlaceOrder(Guid UserId, Guid TickerId, int Quantity) : ICommand<PlaceOrderResponse>;
 
 
 

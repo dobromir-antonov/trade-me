@@ -14,10 +14,10 @@ internal sealed class PlaceOrderEndpoint : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder endpoints)
     {
         endpoints
-            .MapPost("place/{userId:guid}", async (PlaceOrderRequest request, ISender sender, CancellationToken cancellationToken) =>
+            .MapPost("place/{userId:guid}", async (Guid userId, PlaceOrderRequest request, ISender sender, CancellationToken cancellationToken) =>
             {
                 Result<PlaceOrderResponse> result = await sender.Send(
-                    new PlaceOrder(request.UserId, request.TickerId, request.Quantity), 
+                    new PlaceOrder(userId, request.TickerId, request.Quantity), 
                     cancellationToken);
 
                 return result.Match(

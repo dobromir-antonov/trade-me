@@ -1,6 +1,6 @@
 ﻿namespace Modules.Orders.Domain.Outbox;
 
-public sealed class OutboxIntegrationEvent(string EventName, string EventContent, DateTime CreatedOn)
+public sealed class OutboxMessage(string EventName, string EventContent, DateTime CreatedOn)
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
     public string EventName { get; private set; } = EventName;
