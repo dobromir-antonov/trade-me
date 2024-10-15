@@ -7,6 +7,7 @@ namespace Modules.Portfolio.Domain.UserPortfolios;
 
 public sealed class UserPortfolio : AggregateRoot<UserPortfolioId>
 {
+    public decimal Total { get; private set; }
     public ReadOnlyCollection<PortfolioLine> Lines { get; private set; }
 
     //EF Core
@@ -19,5 +20,11 @@ public sealed class UserPortfolio : AggregateRoot<UserPortfolioId>
     public static UserPortfolio Create(UserPortfolioId id)
     {
         return new UserPortfolio(id);
+    }
+
+
+    public void AddLine(PortfolioLine line)
+    { 
+    
     }
 }

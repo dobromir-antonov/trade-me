@@ -2,4 +2,4 @@
 
 namespace Modules.Portfolio.Application.Portfolio.GetPortfolio;
 
-internal sealed record GetPortfolio(Guid UserId) : IQuery<GetPortfolioResponse>;
+internal sealed record GetPortfolio(Guid UserId) : IQuery<GetPortfolioResponse[]>;

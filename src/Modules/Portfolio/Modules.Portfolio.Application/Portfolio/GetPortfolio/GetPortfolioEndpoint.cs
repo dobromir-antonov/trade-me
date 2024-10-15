@@ -16,7 +16,7 @@ internal sealed class GetPortfolioEndpoint : IEndpoint
         app
            .MapGet("{userId:guid}", async (Guid userId, ISender sender, CancellationToken cancellationToken) =>
            {
-               Result<GetPortfolioResponse> result = await sender.Send(new GetPortfolio(userId), cancellationToken);
+               Result<GetPortfolioResponse[]> result = await sender.Send(new GetPortfolio(userId), cancellationToken);
 
                return result.Match(
                    response => Results.Ok(response),

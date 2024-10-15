@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using SharedKernel.Domain;
@@ -43,7 +42,5 @@ public sealed class PublishDomainEventsInterceptor(IPublisher publisher) : SaveC
         {
             await _publisher.Publish(domainEvent, cancellationToken);
         }
-
-
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Modules.Orders.Domain;
+﻿namespace Modules.Orders.Application;
 
 public interface IUnitOfWork
 {

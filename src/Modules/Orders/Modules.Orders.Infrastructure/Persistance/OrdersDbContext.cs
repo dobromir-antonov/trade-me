@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Modules.Orders.Application;
 using Modules.Orders.Domain;
 using Modules.Orders.Domain.Tickers;
 using Modules.Orders.Infrastructure.Outbox;

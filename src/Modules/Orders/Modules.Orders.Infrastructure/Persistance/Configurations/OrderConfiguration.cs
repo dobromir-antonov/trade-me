@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Modules.Orders.Domain;
 using Modules.Orders.Domain.Tickers;
+using Modules.Orders.Domain.Tickers.ValueObjects;
 using Modules.Orders.Domain.ValueObjects;
 
 namespace Modules.Orders.Infrastructure.Persistance.Configurations;

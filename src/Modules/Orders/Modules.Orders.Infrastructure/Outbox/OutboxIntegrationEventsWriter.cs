@@ -30,6 +30,7 @@ public class OutboxIntegrationEventsWriter(IServiceScopeFactory scopeFactory, IL
            TickerId: e.TickerId, 
            Quantity: e.Quantity,
            Price: e.Price,
+           Side: e.Side,
            UserId: e.UserId);
 
         await AddOutboxIntegrationEventAsync(integrationEvent, cancellationToken);
@@ -43,14 +44,14 @@ public class OutboxIntegrationEventsWriter(IServiceScopeFactory scopeFactory, IL
 
     private async Task AddOutboxIntegrationEventAsync(IIntegrationEvent integrationEvent, CancellationToken cancellationToken = default)
     {
-        //SHOULD NOT BE USED A NEW SCOPE, DB CONTEXT HAS TO BE THE SAME, SO 1 transaction to be used
+        //TODO: SHOULD USE THE SAME DB TRANSACTION 
         //CURRENTLY IT USES NEW TRANSACTION
         using var scope = scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<OrdersDbContext>();
         var outboxMessage = new OutboxIntegrationEvent
         {
             Id = Guid.NewGuid(),
-            Type = integrationEvent.GetType().Name,
+            Type = integrationEvent.GetType().FullName,
             Content = JsonConvert.SerializeObject(integrationEvent, _jsonSerializerSettings),
             CreatedOnUtc = DateTime.UtcNow
         };

@@ -18,11 +18,9 @@ public sealed class OutboxIntegrationEventsPublisherJob(
     private PeriodicTimer _timer;
     private const int ExecutionPeriodInSeconds = 5;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+    private readonly Assembly _integrationEventsAssembly = IntegrationEvents.AssemblyReference.Assembly;
     private readonly ILogger<OutboxIntegrationEventsPublisherJob> _logger = logger;
-    private static readonly JsonSerializerSettings _jsonSerializerSettings = new()
-    {
-        TypeNameHandling = TypeNameHandling.All
-    };
+
 
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -76,7 +74,8 @@ public sealed class OutboxIntegrationEventsPublisherJob(
         {
             try
             {
-                var integrationEvent = JsonConvert.DeserializeObject(e.Content, _jsonSerializerSettings);
+                var type = _integrationEventsAssembly.GetType(e.Type);
+                var integrationEvent = JsonConvert.DeserializeObject(e.Content, type);
 
                 //TODO: Add polly for retry
                 await integrationEventPublisher.Publish(integrationEvent, ct);

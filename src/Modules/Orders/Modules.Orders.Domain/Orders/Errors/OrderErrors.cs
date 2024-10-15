@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 
-namespace Modules.Orders.Domain.Orders;
+namespace Modules.Orders.Domain.Orders.Errors;
 
 internal static class OrderErrors
 {

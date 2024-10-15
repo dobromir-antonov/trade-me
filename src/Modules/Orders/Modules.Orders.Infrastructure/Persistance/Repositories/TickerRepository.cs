@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Modules.Orders.Domain;
 using Modules.Orders.Domain.Tickers;
+using Modules.Orders.Domain.Tickers.Abstraction;
+using Modules.Orders.Domain.Tickers.ValueObjects;
 
 namespace Modules.Orders.Infrastructure.Persistance.Repositories;
 

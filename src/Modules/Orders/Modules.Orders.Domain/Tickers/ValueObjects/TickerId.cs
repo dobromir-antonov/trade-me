@@ -1,6 +1,6 @@
 ﻿using SharedKernel.Domain;
 
-namespace Modules.Orders.Domain;
+namespace Modules.Orders.Domain.Tickers.ValueObjects;
 
 public sealed class TickerId : ValueObject
 {

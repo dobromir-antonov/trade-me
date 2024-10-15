@@ -1,4 +1,4 @@
-﻿namespace Modules.Orders.Domain;
+﻿namespace Modules.Portfolio.Domain.Orders.Abstraction;
 
 public interface IOrderRepository
 {

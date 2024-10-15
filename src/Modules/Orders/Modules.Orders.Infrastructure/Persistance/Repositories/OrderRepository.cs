@@ -1,4 +1,5 @@
 ﻿using Modules.Orders.Domain;
+using Modules.Orders.Domain.Orders.Abstraction;
 
 namespace Modules.Orders.Infrastructure.Persistance.Repositories;
 

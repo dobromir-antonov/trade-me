@@ -38,6 +38,9 @@ namespace Modules.Orders.Infrastructure.Persistance.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("quantity");
 
+                    b.Property<int>("Side")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("TickerId")
                         .HasColumnType("uuid")
                         .HasColumnName("ticker_id");
@@ -53,7 +56,33 @@ namespace Modules.Orders.Infrastructure.Persistance.Migrations
                     b.ToTable("orders", "orders");
                 });
 
-            modelBuilder.Entity("Modules.Orders.Domain.Outbox.OutboxIntegrationEvent", b =>
+            modelBuilder.Entity("Modules.Orders.Domain.Tickers.Ticker", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("code");
+
+                    b.Property<decimal>("LastPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("last_price");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tickers", "orders");
+                });
+
+            modelBuilder.Entity("Modules.Orders.Infrastructure.Outbox.OutboxIntegrationEvent", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid")
@@ -89,32 +118,6 @@ namespace Modules.Orders.Infrastructure.Persistance.Migrations
                     NpgsqlIndexBuilderExtensions.IncludeProperties(b.HasIndex("CreatedOnUtc", "ProcessedOnUtc"), new[] { "Id", "Type", "Content" });
 
                     b.ToTable("outbox_integration_events", "orders");
-                });
-
-            modelBuilder.Entity("Modules.Orders.Domain.Tickers.Ticker", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("code");
-
-                    b.Property<decimal>("LastPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)")
-                        .HasColumnName("last_price");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_on");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("tickers", "orders");
                 });
 
             modelBuilder.Entity("Modules.Orders.Domain.Order", b =>

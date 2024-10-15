@@ -8,13 +8,21 @@
 @tesla = 65fb92d7-a296-4197-99d7-6b747827909d
 @nvidia = 99758f07-12b8-411c-b646-9162a54692dc
 
+
+# place order
 POST http://{{host}}:{{port}}/api/{{version}}/orders/place/{{userId}}
 Content-Type: application/json
 Accept-Language: en-US,en;q=0.5
 
 {
     "tickerId": "{{apple}}",
-    "quantity": 10
+    "quantity": 10,
+    "side": 1
 }
+###
 
+# get portfolio
+GET http://{{host}}:{{port}}/api/{{version}}/portfolio/{{userId}}
+Content-Type: application/json
+Accept-Language: en-US,en;q=0.5
 ###

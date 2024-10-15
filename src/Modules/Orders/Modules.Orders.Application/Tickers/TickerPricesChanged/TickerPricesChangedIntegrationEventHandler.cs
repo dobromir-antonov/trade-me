@@ -2,11 +2,12 @@
 using Microsoft.Extensions.Logging;
 using Modules.Orders.Domain;
 using Modules.Orders.Domain.Tickers;
+using Modules.Orders.Domain.Tickers.Abstraction;
 using Modules.Price.IntegrationEvents;
 using SharedKernel.Messaging;
 using System.Threading;
 
-namespace Modules.Orders.Application.Tickers.Events
+namespace Modules.Orders.Application.Tickers.TickerPricesChanged
 {
     public class TickerPricesChangedIntegrationEventHandler(
         IServiceScopeFactory serviceScopeFactory,

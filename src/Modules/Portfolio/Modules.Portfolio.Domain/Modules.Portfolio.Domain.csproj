@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UserPortfolios\DomainEvents\" />
+    <Folder Include="UserPortfolios\Events\" />
   </ItemGroup>
 
 </Project>
