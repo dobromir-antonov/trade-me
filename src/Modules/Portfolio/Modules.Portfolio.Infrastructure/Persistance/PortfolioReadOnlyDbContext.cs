@@ -1,14 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Modules.Portfolio.Application.Abstraction;
-using Modules.Portfolio.Application.Portfolio.GetPortfolio;
 using System.Reflection;
 
 namespace Modules.Portfolio.Infrastructure.Persistance;
 
 public sealed class PortfolioReadOnlyDbContext : DbContext, IPortfolioReadOnlyDbContext
 {
-    public DbSet<GetPortfolioResponse> UserPortfolios { get; set; }
-
     public PortfolioReadOnlyDbContext(DbContextOptions<PortfolioReadOnlyDbContext> options) : base(options)
     {
         ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
@@ -16,13 +13,14 @@ public sealed class PortfolioReadOnlyDbContext : DbContext, IPortfolioReadOnlyDb
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
         modelBuilder.HasDefaultSchema(Schema.DefaultSchema);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-        modelBuilder.Entity<GetPortfolioResponse>().HasNoKey();
-
         base.OnModelCreating(modelBuilder);
     }
+
+    public IQueryable<T> SqlQuery<T>(FormattableString query) => Database.SqlQuery<T>(query);
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
         => throw new InvalidOperationException("This context is read-only");

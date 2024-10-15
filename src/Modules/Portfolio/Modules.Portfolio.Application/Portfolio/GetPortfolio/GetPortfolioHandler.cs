@@ -7,11 +7,10 @@ namespace Modules.Portfolio.Application.Portfolio.GetPortfolio;
 
 internal sealed class GetPortfolioHandler(IPortfolioReadOnlyDbContext context) : IQueryHander<GetPortfolio, GetPortfolioResponse[]>
 {
-
     public async Task<Result<GetPortfolioResponse[]>> Handle(GetPortfolio request, CancellationToken cancellationToken)
     {
-        var result = await context.UserPortfolios
-            .FromSqlInterpolated($@"
+        return await context
+            .SqlQuery<GetPortfolioResponse>($@"
                 SELECT 	o.ticker_id as TickerId
                 ,		SUM(CASE WHEN o.side = 0 THEN o.quantity ELSE -o.quantity END) AS NetQuantity
                 ,		SUM(CASE WHEN o.side = 0 THEN o.quantity * o.price ELSE 0 END) - SUM(CASE WHEN o.side = 1 THEN o.quantity * o.price ELSE 0 END) AS NetWorth
@@ -24,9 +23,7 @@ internal sealed class GetPortfolioHandler(IPortfolioReadOnlyDbContext context) :
 		
                 GROUP BY
 		                o.ticker_id")
-            .ToArrayAsync();
-
-        return result;
+            .ToArrayAsync(cancellationToken);
     }
 
 }
