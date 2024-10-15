@@ -37,7 +37,7 @@ public class Order : AggregateRoot<OrderId>
             return OrderErrors.InvalidQuantity;
         }
 
-        order.AddDomainEvent(new OrderPlacedDomainEvent(order.Id));
+        order.AddDomainEvent(new OrderPlacedEvent(order.Id, order.TickerId, order.Quantity, order.Price, order.UserId));
 
         return order;
     }

@@ -28,7 +28,7 @@ public class PriceModule : IModule
     {
     }
 
-    public void ConfigureMassTransit(IBusRegistrationConfigurator bus)
+    public void ConfigureMassTransit(IServiceCollection services, IBusRegistrationConfigurator bus)
     {
     }
 

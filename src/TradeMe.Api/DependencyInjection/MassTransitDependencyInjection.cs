@@ -16,7 +16,7 @@ public static class MassTransitDependencyInjection
             // Configure each module's MassTransit setup
             foreach (var module in modules)
             {
-                module.ConfigureMassTransit(bus);
+                module.ConfigureMassTransit(services, bus);
             }
            
         });

@@ -11,7 +11,7 @@ public interface IModule
 {
     void AddModule(IServiceCollection services, IConfiguration configuration);
     void UseModule(WebApplication app);
-    void ConfigureMassTransit(IBusRegistrationConfigurator bus);
+    void ConfigureMassTransit(IServiceCollection services, IBusRegistrationConfigurator bus);
 
     Assembly GetDomainAssembly();
     Assembly GetApplicationAssembly();

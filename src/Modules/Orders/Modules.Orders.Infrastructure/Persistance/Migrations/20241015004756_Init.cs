@@ -15,6 +15,23 @@ namespace Modules.Orders.Infrastructure.Persistance.Migrations
                 name: "orders");
 
             migrationBuilder.CreateTable(
+                name: "outbox_integration_events",
+                schema: "orders",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    type = table.Column<string>(type: "VARCHAR", maxLength: 255, nullable: false),
+                    content = table.Column<string>(type: "JSONB", nullable: false),
+                    created_on_utc = table.Column<DateTime>(type: "TIMESTAMP WITH TIME ZONE", nullable: false),
+                    processed_on_utc = table.Column<DateTime>(type: "TIMESTAMP WITH TIME ZONE", nullable: true),
+                    error = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_outbox_integration_events", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "tickers",
                 schema: "orders",
                 columns: table => new
@@ -56,6 +73,13 @@ namespace Modules.Orders.Infrastructure.Persistance.Migrations
                 schema: "orders",
                 table: "orders",
                 column: "ticker_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_outbox_integration_events_created_on_utc_processed_on_utc",
+                schema: "orders",
+                table: "outbox_integration_events",
+                columns: new[] { "created_on_utc", "processed_on_utc" })
+                .Annotation("Npgsql:IndexInclude", new[] { "id", "type", "content" });
         }
 
         /// <inheritdoc />
@@ -63,6 +87,10 @@ namespace Modules.Orders.Infrastructure.Persistance.Migrations
         {
             migrationBuilder.DropTable(
                 name: "orders",
+                schema: "orders");
+
+            migrationBuilder.DropTable(
+                name: "outbox_integration_events",
                 schema: "orders");
 
             migrationBuilder.DropTable(

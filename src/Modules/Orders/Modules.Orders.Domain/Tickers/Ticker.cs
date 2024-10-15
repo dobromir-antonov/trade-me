@@ -21,7 +21,7 @@ public sealed class Ticker : AggregateRoot<TickerId>
     public static Ticker Create(TickerId id, string code, decimal lastPrice, DateTime updatedOn)
     {
         var t = new Ticker(id, code, lastPrice, updatedOn);
-        t.AddDomainEvent(new TickerCreatedDomainEvent(t.Id));
+        t.AddDomainEvent(new TickerCreatedEvent(t.Id));
 
         return t;
     }
@@ -30,6 +30,6 @@ public sealed class Ticker : AggregateRoot<TickerId>
     {
         LastPrice = price;
         UpdatedOn = DateTime.UtcNow;
-        AddDomainEvent(new TickerPriceAdjustedDomainEvent(Id, LastPrice));
+        AddDomainEvent(new TickerPriceAdjustedEvent(Id, LastPrice));
     }
 }

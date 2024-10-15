@@ -1,23 +1,27 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.Builder;
+using FluentValidation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Modules.Orders.Application.Tickers.Events;
 using Modules.Orders.Domain;
+using Modules.Orders.Infrastructure.Events;
 using Modules.Orders.Infrastructure.Idempotence;
+using Modules.Orders.Infrastructure.Outbox;
+using Modules.Orders.Infrastructure.OutboxWriter;
 using Modules.Orders.Infrastructure.Persistance;
 using Modules.Orders.Infrastructure.Persistance.Repositories;
+using Modules.Orders.Infrastructure.Validation;
 using Modules.Price.IntegrationEvents;
 using SharedKernel.Infrastructure;
 using SharedKernel.Messaging;
 using System.Reflection;
-using FluentValidation;
-using Modules.Orders.Infrastructure.Validation;
 
 namespace Modules.Orders.Infrastructure;
 
@@ -31,14 +35,16 @@ public class OrdersModule : IModule
     public void AddModule(IServiceCollection services, IConfiguration configuration)
     {
         RegisterValidation(services);
+        RegisterPersistance(services, configuration);
+        RegisterOutbox(services);
         RegisterMediator(services);
         RegisterEndpointVersioning(services);
-        RegisterPersistance(services, configuration);
-        RegisterIntegrationEventHandlers(services);
     }
 
     public void UseModule(WebApplication app)
     {
+        // app.UseMiddleware<EventualConsistencyMiddleware>();
+
         MapEndpoints(app);
 
         if (app.Environment.IsDevelopment())
@@ -47,17 +53,26 @@ public class OrdersModule : IModule
         }
     }
 
-    public void ConfigureMassTransit(IBusRegistrationConfigurator bus)
+    public void ConfigureMassTransit(IServiceCollection services, IBusRegistrationConfigurator bus)
     {
+        services.AddScoped<IIntegrationEventHandler<TickerPricesChangedIntegrationEvent>, TickerPricesChangedIntegrationEventHandler>();
         bus.AddConsumer<IdempotentIntegrationEventConsumer<TickerPricesChangedIntegrationEvent>>();
     }
 
+    private static void RegisterOutbox(IServiceCollection services)
+    {
+        services.AddHostedService<OutboxIntegrationEventsPublisherJob>();
+        services.AddScoped<OutboxIntegrationEventsWriter>();
+    }
 
     private static void RegisterMediator(IServiceCollection services)
     {
         services.AddMediatR(cfg =>
         {
-            cfg.RegisterServicesFromAssembly(Application.AssemblyReference.Assembly);
+            cfg.RegisterServicesFromAssemblies(
+                Application.AssemblyReference.Assembly, 
+                AssemblyReference.Assembly);
+
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
     }
@@ -85,19 +100,19 @@ public class OrdersModule : IModule
 
     private static void RegisterPersistance(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<OrdersDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("Orders")));
+        services.AddSingleton<PublishDomainEventsInterceptor>();
 
-        services.AddTransient<IUnitOfWork, UnitOfWork>();
+        services.AddDbContext<OrdersDbContext>((sp, options) => 
+            options
+                .UseNpgsql(
+                    configuration.GetConnectionString("Orders"),
+                    cfg => cfg.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schema.DefaultSchema))
+                .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>()));
 
         services
+            .AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<OrdersDbContext>())
             .AddScoped<IOrderRepository, OrderRepository>()
             .AddScoped<ITickerRepository, TickerRepository>();
-    }
-
-    private static void RegisterIntegrationEventHandlers(IServiceCollection services)
-    {
-        services
-             .AddScoped<IIntegrationEventHandler<TickerPricesChangedIntegrationEvent>, TickerPricesChangedIntegrationEventHandler>();
     }
 
     private static void MapEndpoints(WebApplication app)

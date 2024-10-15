@@ -3,19 +3,27 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Modules.Orders.Domain.Outbox;
 using Modules.Orders.Infrastructure.Persistance;
+using Newtonsoft.Json;
 using SharedKernel.Messaging;
+using System.Reflection;
 
-namespace Modules.Orders.Infrastructure.BackgroundJobs;
+namespace Modules.Orders.Infrastructure.Outbox;
 
-public sealed class IntegrationEventsPublisherJob(IServiceScopeFactory serviceScopeFactory, ILogger<IntegrationEventsPublisherJob> logger) : IHostedService
+public sealed class OutboxIntegrationEventsPublisherJob(
+    IServiceScopeFactory serviceScopeFactory, 
+    ILogger<OutboxIntegrationEventsPublisherJob> logger) : IHostedService
 {
     private Task _job;
     private PeriodicTimer _timer;
     private const int ExecutionPeriodInSeconds = 5;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
-    private readonly ILogger<IntegrationEventsPublisherJob> _logger = logger;
+    private readonly ILogger<OutboxIntegrationEventsPublisherJob> _logger = logger;
+    private static readonly JsonSerializerSettings _jsonSerializerSettings = new()
+    {
+        TypeNameHandling = TypeNameHandling.All
+    };
+
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -53,26 +61,40 @@ public sealed class IntegrationEventsPublisherJob(IServiceScopeFactory serviceSc
         var dbContext = scope.ServiceProvider.GetRequiredService<OrdersDbContext>();
         var integrationEventPublisher = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 
-        //List<OutboxIntegrationEvent> outboxIntegrationEvents = await dbContext.OutboxIntegrationEvents.ToListAsync(ct);
+        //TODO: scale it with FOR UPDATE SKIP LOCKED
+        OutboxIntegrationEvent[] outboxIntegrationEvents = await dbContext.OutboxIntegrationEvents
+            .Where(x => x.ProcessedOnUtc == null)
+            .Take(10)
+            .ToArrayAsync(ct);
 
-        //if (outboxIntegrationEvents.Count == 0)
-        //{
-        //    return;
-        //}
+        if (outboxIntegrationEvents.Length == 0)
+        {
+            return;
+        }
 
-        //foreach (OutboxIntegrationEvent outboxIntegrationEvent in outboxIntegrationEvents)
-        //{
-        //    IIntegrationEvent integrationEvent = IntegrationEventFactory(outboxIntegrationEvent);
+        foreach (var e in outboxIntegrationEvents)
+        {
+            try
+            {
+                var integrationEvent = JsonConvert.DeserializeObject(e.Content, _jsonSerializerSettings);
 
-        //    //TODO: Add polly for retry
-        //    await integrationEventPublisher.Publish(integrationEvent, integrationEvent.GetType(), ct);
-        //}
+                //TODO: Add polly for retry
+                await integrationEventPublisher.Publish(integrationEvent, ct);
 
-        //dbContext.RemoveRange(outboxIntegrationEvents);
+                e.ProcessedOnUtc = DateTime.UtcNow;
+            }
+            catch (Exception ex)
+            {
+                e.ProcessedOnUtc = DateTime.UtcNow;
+                e.Error = ex.ToString();
+            }
+        }
+
+        dbContext.UpdateRange(outboxIntegrationEvents);
         await dbContext.SaveChangesAsync(ct);
     }
 
-    private IIntegrationEvent IntegrationEventFactory(OutboxMessage outbox)
+    private IIntegrationEvent IntegrationEventFactory(OutboxIntegrationEvent outbox)
     {
         // if (outbox.EventName == typeof(UserCreatedIntegrationEvent).Name) return JsonConvert.DeserializeObject<UserCreatedIntegrationEvent>(outbox.EventContent)!;
 

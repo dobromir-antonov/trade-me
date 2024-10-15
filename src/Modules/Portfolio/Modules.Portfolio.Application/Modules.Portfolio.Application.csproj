@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Orders\Modules.Orders.IntegrationEvents\Modules.Orders.IntegrationEvents.csproj" />
     <ProjectReference Include="..\Modules.Portfolio.Domain\Modules.Portfolio.Domain.csproj" />
   </ItemGroup>
 

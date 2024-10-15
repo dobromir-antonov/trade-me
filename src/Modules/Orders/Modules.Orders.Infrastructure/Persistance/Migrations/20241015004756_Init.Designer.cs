@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Modules.Orders.Infrastructure.Persistance.Migrations
 {
     [DbContext(typeof(OrdersDbContext))]
-    [Migration("20241014162627_Init")]
+    [Migration("20241015004756_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -54,6 +54,44 @@ namespace Modules.Orders.Infrastructure.Persistance.Migrations
                     b.HasIndex("TickerId");
 
                     b.ToTable("orders", "orders");
+                });
+
+            modelBuilder.Entity("Modules.Orders.Domain.Outbox.OutboxIntegrationEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("JSONB")
+                        .HasColumnName("content");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("TIMESTAMP WITH TIME ZONE")
+                        .HasColumnName("created_on_utc");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text")
+                        .HasColumnName("error");
+
+                    b.Property<DateTime?>("ProcessedOnUtc")
+                        .HasColumnType("TIMESTAMP WITH TIME ZONE")
+                        .HasColumnName("processed_on_utc");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedOnUtc", "ProcessedOnUtc");
+
+                    NpgsqlIndexBuilderExtensions.IncludeProperties(b.HasIndex("CreatedOnUtc", "ProcessedOnUtc"), new[] { "Id", "Type", "Content" });
+
+                    b.ToTable("outbox_integration_events", "orders");
                 });
 
             modelBuilder.Entity("Modules.Orders.Domain.Tickers.Ticker", b =>

@@ -15,5 +15,11 @@ public abstract class AggregateRoot<TId> : Entity<TId>, IHasDomainEvents where T
     {
         _domainEvents.Add(domainEvent);
     }
-    public void ClearDomainEvents() => _domainEvents.Clear();
+    public IDomainEvent[] PopDomainEvents()
+    {
+        var copy = _domainEvents.ToArray();
+        _domainEvents.Clear();
+
+        return copy;
+    }
 }

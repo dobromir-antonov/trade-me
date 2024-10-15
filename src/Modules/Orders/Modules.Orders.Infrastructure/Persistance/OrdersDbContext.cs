@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Design;
 using Modules.Orders.Domain;
 using Modules.Orders.Domain.Tickers;
+using Modules.Orders.Infrastructure.Outbox;
 using System.Reflection;
 
 namespace Modules.Orders.Infrastructure.Persistance;
@@ -10,15 +11,15 @@ public class OrdersDbContext(DbContextOptions<OrdersDbContext> options) : DbCont
 {
     public DbSet<Order> Orders { get; set; }
     public DbSet<Ticker> Tickers { get; set; }
+    public DbSet<OutboxIntegrationEvent> OutboxIntegrationEvents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("orders");
+        modelBuilder.HasDefaultSchema(Schema.DefaultSchema);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         base.OnModelCreating(modelBuilder);
     }
-
 }
 
 public class OrdersDbContextFactory : IDesignTimeDbContextFactory<OrdersDbContext>

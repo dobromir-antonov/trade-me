@@ -6,11 +6,15 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Modules.Orders.IntegrationEvents;
+using Modules.Portfolio.Application.Orders.Events;
 using Modules.Portfolio.Domain;
 using Modules.Portfolio.Domain.UserPortfolios.Abstraction;
+using Modules.Portfolio.Infrastructure.Idempotence;
 using Modules.Portfolio.Infrastructure.Persistance;
 using Modules.Portfolio.Infrastructure.Persistance.Repositories;
 using SharedKernel.Infrastructure;
+using SharedKernel.Messaging;
 using System.Reflection;
 
 namespace Modules.Portfolio.Infrastructure;
@@ -37,8 +41,10 @@ public class PortfolioModule : IModule
         MapEndpoints(app);
     }
 
-    public void ConfigureMassTransit(IBusRegistrationConfigurator bus)
+    public void ConfigureMassTransit(IServiceCollection services, IBusRegistrationConfigurator bus)
     {
+        services.AddScoped<IIntegrationEventHandler<OrderPlacedIntegrationEvent>, OrderPlacedIntegrationEventHandler>();
+        bus.AddConsumer<IdempotentIntegrationEventConsumer<OrderPlacedIntegrationEvent>>();
     }
 
 
