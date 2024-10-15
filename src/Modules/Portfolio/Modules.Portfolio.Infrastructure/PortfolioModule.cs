@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Modules.Orders.IntegrationEvents;
-using Modules.Portfolio.Application.Orders.Events;
+using Modules.Portfolio.Application.Orders.OrderPlaced;
 using Modules.Portfolio.Domain;
 using Modules.Portfolio.Domain.UserPortfolios.Abstraction;
 using Modules.Portfolio.Infrastructure.Idempotence;

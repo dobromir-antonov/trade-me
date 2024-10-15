@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Modules.Orders.IntegrationEvents;
 using SharedKernel.Messaging;
 
-namespace Modules.Portfolio.Application.Orders.Events;
+namespace Modules.Portfolio.Application.Orders.OrderPlaced;
 
 public class OrderPlacedIntegrationEventHandler(
     IServiceScopeFactory serviceScopeFactory,
