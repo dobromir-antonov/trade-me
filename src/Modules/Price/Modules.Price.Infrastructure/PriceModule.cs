@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Modules.Price.Infrastructure.BackgroundJobs;
 using Modules.Price.Infrastructure.Persistance;
+using Modules.Price.IntegrationEvents;
+using RabbitMQ.Client;
 using SharedKernel.Infrastructure;
 using System.Reflection;
 
@@ -28,9 +30,15 @@ public class PriceModule : IModule
     {
     }
 
-    public void ConfigureMassTransit(IServiceCollection services, IBusRegistrationConfigurator bus)
+    public void AddMessageBrokerConsumers(IServiceCollection services, IBusRegistrationConfigurator bus)
     {
     }
 
-   
+    public void ConfigureRabbitMqEndpoints(IBusRegistrationContext context, IRabbitMqBusFactoryConfigurator cfg)
+    {
+        cfg.Publish<TickerPricesChangedIntegrationEvent>(p =>
+        {
+            p.ExchangeType = ExchangeType.Fanout;
+        });
+    }
 }

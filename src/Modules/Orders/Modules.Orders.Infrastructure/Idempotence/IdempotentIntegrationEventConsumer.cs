@@ -13,6 +13,7 @@ public class IdempotentIntegrationEventConsumer<T>(
     {
         try
         {
+            logger.LogInformation(typeof(T));
             // check if message is already processed
 
             if (handler is null)

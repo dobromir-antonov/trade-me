@@ -3,11 +3,6 @@
 namespace Modules.Price.IntegrationEvents;
 
 
-public sealed class TickerPricesChangedIntegrationEvent(TickerPrice[] tickers) : IIntegrationEvent
-{
-    public Guid Id { get; }
-    public DateTime OccuredOnUtc { get; }
-    public TickerPrice[] Tickers { get; } = tickers;
-}
+public sealed record TickerPricesChangedIntegrationEvent(TickerPrice[] Tickers) : IIntegrationEvent;
 
-public record TickerPrice(Guid TickerId, string TickerCode, decimal Price);
+public sealed record TickerPrice(Guid TickerId, string TickerCode, decimal Price);

@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services
         .AddGlobalErrorHandling()
         .AddSwaggerPackage()
-        .AddMassTransitDependency(modules);
+        .AddMessageBroker(modules);
 
     builder.Services.AddCors(options =>
     {

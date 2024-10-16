@@ -1,11 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Modules.Orders.Domain;
 using Modules.Orders.Domain.Tickers;
 using Modules.Orders.Domain.Tickers.Abstraction;
 using Modules.Price.IntegrationEvents;
 using SharedKernel.Messaging;
-using System.Threading;
 
 namespace Modules.Orders.Application.Tickers.TickerPricesChanged
 {

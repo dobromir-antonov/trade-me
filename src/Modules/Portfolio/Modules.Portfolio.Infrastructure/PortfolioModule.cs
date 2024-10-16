@@ -19,6 +19,7 @@ using Modules.Portfolio.Infrastructure.Idempotence;
 using Modules.Portfolio.Infrastructure.Persistance;
 using Modules.Portfolio.Infrastructure.Persistance.Repositories;
 using Modules.Price.IntegrationEvents;
+using RabbitMQ.Client;
 using SharedKernel.Infrastructure;
 using SharedKernel.Messaging;
 using System.Reflection;
@@ -31,94 +32,36 @@ public class PortfolioModule : IModule
 
     public Assembly GetDomainAssembly() => Domain.AssemblyReference.Assembly;
 
-    public Assembly GetInfrasturctureAssembly() => Infrastructure.AssemblyReference.Assembly;
+    public Assembly GetInfrasturctureAssembly() => AssemblyReference.Assembly;
 
 
     public void AddModule(IServiceCollection services, IConfiguration configuration)
     {
-        RegisterMediator(services);
-        RegisterEndpointVersioning(services);
-        RegisterPersistance(services, configuration);
+        services.RegisterPortfolioModule(configuration);
     }
 
     public void UseModule(WebApplication app)
     {
-        MapEndpoints(app);
-
-        if (app.Environment.IsDevelopment())
-        {
-            ApplyMigrations(app);
-        }
+        app.UsePortfolioModule();
     }
 
-    public void ConfigureMassTransit(IServiceCollection services, IBusRegistrationConfigurator bus)
+    public void AddMessageBrokerConsumers(IServiceCollection services, IBusRegistrationConfigurator bus)
     {
-        services.AddScoped<IIntegrationEventHandler<TickerPricesChangedIntegrationEvent>, TickerPricesChangedIntegrationEventHandler>();
-        services.AddScoped<IIntegrationEventHandler<OrderPlacedIntegrationEvent>, OrderPlacedIntegrationEventHandler>();
-
         bus.AddConsumer<IdempotentIntegrationEventConsumer<TickerPricesChangedIntegrationEvent>>();
         bus.AddConsumer<IdempotentIntegrationEventConsumer<OrderPlacedIntegrationEvent>>();
     }
 
-
-    private static void RegisterMediator(IServiceCollection services)
+    public void ConfigureRabbitMqEndpoints(IBusRegistrationContext context, IRabbitMqBusFactoryConfigurator cfg)
     {
-        services.AddMediatR(options => options.RegisterServicesFromAssembly(Application.AssemblyReference.Assembly));
+        cfg.ReceiveEndpoint(
+            "portfolio.ticker-prices-changed",
+            o => o.ConfigureConsumer<IdempotentIntegrationEventConsumer<TickerPricesChangedIntegrationEvent>>(context)
+        );
+
+        cfg.ReceiveEndpoint(
+            "portfolio.order-placed",
+            o => o.ConfigureConsumer<IdempotentIntegrationEventConsumer<OrderPlacedIntegrationEvent>>(context)
+        );
     }
 
-    private static void RegisterEndpointVersioning(IServiceCollection services)
-    {
-        services
-            .AddApiVersioning(options =>
-            {
-                options.DefaultApiVersion = new ApiVersion(1);
-                options.ApiVersionReader = new UrlSegmentApiVersionReader();
-            })
-            .AddApiExplorer(options =>
-            {
-                options.GroupNameFormat = "'v'V";
-                options.SubstituteApiVersionInUrl = true;
-            });
-
-    }
-
-    private static void RegisterPersistance(IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddDbContext<PortfolioDbContext>(o => 
-            o.UseNpgsql(
-                configuration.GetConnectionString("Portfolio"),
-                cfg => cfg.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schema.DefaultSchema)));
-
-        services.AddDbContext<PortfolioReadOnlyDbContext>(o => o.UseNpgsql(configuration.GetConnectionString("Portfolio")));
-
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<PortfolioDbContext>());
-        services.AddScoped<IPortfolioReadOnlyDbContext>(sp => sp.GetRequiredService<PortfolioReadOnlyDbContext>());
-
-        services.AddScoped<ITickerRepository, TickerRepository>();
-        services.AddScoped<IOrderRepository, OrderRepository>();
-        //services.AddScoped<IUserPortfolioRepository, UserPortfolioRepository>();
-    }
-
-    private static void MapEndpoints(WebApplication app)
-    {
-        ApiVersionSet apiVersionSet = app.NewApiVersionSet()
-            .HasApiVersion(new ApiVersion(1))
-            .HasApiVersion(new ApiVersion(2))
-            .ReportApiVersions()
-            .Build();
-
-        RouteGroupBuilder routeGroup = app
-            .MapGroup("api/v{version:apiVersion}/portfolio")
-            .WithApiVersionSet(apiVersionSet);
-
-        app.MapEndpoints(Application.AssemblyReference.Assembly, routeGroup);
-    }
-
-    private static void ApplyMigrations(WebApplication app)
-    {
-        IServiceScopeFactory factory = app.Services.GetRequiredService<IServiceScopeFactory>();
-        using var scope = factory.CreateScope();
-        using var dbContext = scope.ServiceProvider.GetRequiredService<PortfolioDbContext>();
-        dbContext.Database.Migrate();
-    }
 }

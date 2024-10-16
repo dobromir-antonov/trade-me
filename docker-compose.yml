@@ -1,4 +1,5 @@
 services:
+
 # trade me api
   trademe.api:
     image: ${DOCKER_REGISTRY-}trademeapi
@@ -12,8 +13,24 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__Postgres=Host=trademe.db;Port=5432;Database=trademe;Username=postgres;Password=postgrespw
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
     depends_on:
       - trademe.db
+      - rabbitmq
+    networks:
+      - trademe-network
+
+# rabbitmq
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"  # AMQP protocol port
+      - "15672:15672"  # Management UI port
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
     networks:
       - trademe-network
 
