@@ -13,7 +13,7 @@ namespace Modules.Price.Infrastructure.BackgroundJobs
     {
         private Task _job;
         private PeriodicTimer _timer;
-        private const int ExecutionPeriodInSeconds = 15;
+        private const int ExecutionPeriodInSeconds = 1;
 
         public Task StartAsync(CancellationToken cancellationToken)
         {

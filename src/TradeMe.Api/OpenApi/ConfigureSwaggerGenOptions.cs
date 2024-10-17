@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Lumina.Api.OpenApi;
+namespace TradeMe.Api.OpenApi;
 
 public class ConfigureSwaggerGenOptions : IConfigureNamedOptions<SwaggerGenOptions>
 {

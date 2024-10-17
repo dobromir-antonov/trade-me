@@ -1,7 +1,7 @@
-using Lumina.Api;
-using Lumina.Api.DependencyInjection;
-using Lumina.Api.OpenApi;
+using TradeMe.Api;
+using TradeMe.Api.DependencyInjection;
 using SharedKernel.Infrastructure;
+using TradeMe.Api.OpenApi;
 
 List<IModule> modules = ModuleHelper.GetModules(AppDomain.CurrentDomain.BaseDirectory);
 

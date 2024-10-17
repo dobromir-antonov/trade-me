@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Lumina.Api.DependencyInjection;
+namespace TradeMe.Api.DependencyInjection;
 
 public static class GlobalErrorHandlingDependencyInjection
 {

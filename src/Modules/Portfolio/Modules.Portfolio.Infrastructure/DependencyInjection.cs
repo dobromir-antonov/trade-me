@@ -7,18 +7,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Modules.Orders.Application.Tickers.TickerPricesChanged;
-using Modules.Orders.IntegrationEvents;
 using Modules.Portfolio.Application.Abstraction;
-using Modules.Portfolio.Application.Orders.OrderPlaced;
 using Modules.Portfolio.Domain;
 using Modules.Portfolio.Domain.Orders.Abstraction;
 using Modules.Portfolio.Domain.Tickers.Abstraction;
 using Modules.Portfolio.Infrastructure.Persistance;
 using Modules.Portfolio.Infrastructure.Persistance.Repositories;
-using Modules.Price.IntegrationEvents;
 using SharedKernel.Infrastructure;
-using SharedKernel.Messaging;
 
 namespace Modules.Portfolio.Infrastructure;
 
@@ -30,8 +25,7 @@ internal static class DependencyInjection
         return services
             .RegisterEndpointVersioning()
             .RegisterMediator()
-            .RegisterPersistance(configuration)
-            .RegisterIntegrationEventHandlers();
+            .RegisterPersistance(configuration);
     }
 
     public static WebApplication UsePortfolioModule(this WebApplication app)
@@ -51,12 +45,13 @@ internal static class DependencyInjection
 
     private static IServiceCollection RegisterMediator(this IServiceCollection services)
     {
-        return services.AddMediatR(cfg =>
+        services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssemblies(
                 Application.AssemblyReference.Assembly,
                 AssemblyReference.Assembly);
         });
+        return services;
     }
 
     private static IServiceCollection RegisterEndpointVersioning(this IServiceCollection services)
@@ -90,14 +85,6 @@ internal static class DependencyInjection
 
         services.AddScoped<ITickerRepository, TickerRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
-
-        return services;
-    }
-
-    private static IServiceCollection RegisterIntegrationEventHandlers(this IServiceCollection services)
-    {
-        services.AddScoped<IIntegrationEventHandler<TickerPricesChangedIntegrationEvent>, TickerPricesChangedIntegrationEventHandler>();
-        services.AddScoped<IIntegrationEventHandler<OrderPlacedIntegrationEvent>, OrderPlacedIntegrationEventHandler>();
 
         return services;
     }

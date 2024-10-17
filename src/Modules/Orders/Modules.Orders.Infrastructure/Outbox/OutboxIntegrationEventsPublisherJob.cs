@@ -92,11 +92,5 @@ public sealed class OutboxIntegrationEventsPublisherJob(
         dbContext.UpdateRange(outboxIntegrationEvents);
         await dbContext.SaveChangesAsync(ct);
     }
-
-    private IIntegrationEvent IntegrationEventFactory(OutboxIntegrationEvent outbox)
-    {
-        // if (outbox.EventName == typeof(UserCreatedIntegrationEvent).Name) return JsonConvert.DeserializeObject<UserCreatedIntegrationEvent>(outbox.EventContent)!;
-
-        throw new ArgumentException("Not supported integration event");
-    }
+   
 }

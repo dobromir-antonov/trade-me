@@ -1,9 +1,7 @@
 ﻿using MassTransit;
-using Modules.Price.IntegrationEvents;
-using RabbitMQ.Client;
 using SharedKernel.Infrastructure;
 
-namespace Lumina.Api.DependencyInjection;
+namespace TradeMe.Api.DependencyInjection;
 
 public static class MessageBrokerDependencyInjection
 {
@@ -32,15 +30,9 @@ public static class MessageBrokerDependencyInjection
                     module.ConfigureRabbitMqEndpoints(context, cfg);
                 }
             });
-
-
-
         });
 
 
         return services;
     }
-
-
-
 }

@@ -48,6 +48,12 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
             .IsRequired();
 
         builder
+           .Property(x => x.Side)
+           .HasColumnName("side")
+           .HasDefaultValue(OrderSide.Buy)
+           .IsRequired();
+
+        builder
             .Property(x => x.UserId)
             .HasColumnName("user_id")
             .ValueGeneratedNever()

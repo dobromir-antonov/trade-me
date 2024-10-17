@@ -7,7 +7,7 @@ using SharedKernel.Messaging;
 
 namespace Modules.Orders.Application.Orders.PlaceOrder;
 
-internal sealed class PlaceOrderHandler(
+internal sealed class AdjustPriceHandler(
     IOrderRepository orderRepository, 
     ITickerRepository tickerRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<PlaceOrder, PlaceOrderResponse>

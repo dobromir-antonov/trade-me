@@ -1,11 +1,12 @@
 ﻿using MassTransit;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using SharedKernel.Messaging;
 
-namespace Modules.Portfolio.Infrastructure.Idempotence;
+namespace Modules.Orders.Infrastructure.Idempotent;
 
-public class IdempotentIntegrationEventConsumer<T>(
-    IIntegrationEventHandler<T> handler,
+public sealed class IdempotentIntegrationEventConsumer<T>(
+    IPublisher publisher,
     ILogger<IdempotentIntegrationEventConsumer<T>> logger) : IConsumer<T> where T : class, IIntegrationEvent
 {
 
@@ -15,13 +16,7 @@ public class IdempotentIntegrationEventConsumer<T>(
         {
             // check if message is already processed
 
-            if (handler is null)
-            {
-                logger.LogError("Type of \\'{Type}\\' not found in event types", typeof(T));
-                throw new ArgumentException($"There is no consumer for {typeof(T)}");
-            }
-
-            await handler.Handle(context.Message, context.CancellationToken);
+            await publisher.Publish(context.Message, context.CancellationToken);
         }
         catch (Exception exception)
         {

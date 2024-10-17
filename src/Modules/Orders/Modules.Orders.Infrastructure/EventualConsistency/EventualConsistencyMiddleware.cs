@@ -1,16 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Modules.Orders.Infrastructure.Persistance;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Modules.Orders.Infrastructure.EventualConsistency;
 
 public sealed class EventualConsistencyMiddleware
 {
+    public const string DomainEventsKey = "DomainEventsKey";
     private readonly RequestDelegate _next;
 
     public EventualConsistencyMiddleware(RequestDelegate next)
@@ -22,20 +18,42 @@ public sealed class EventualConsistencyMiddleware
     {
         var transaction = await dbContext.Database.BeginTransactionAsync();
 
-        context.Response.OnCompleted(async () =>
+        try
         {
-            try
-            {
+            await transaction.CommitAsync();
+        }
+        catch
+        {
 
-            }
-            catch (Exception ex)
-            {
-            }
-            finally
-            {
-                await transaction.DisposeAsync();
-            }
-        });
+        }
+        finally
+        {
+            await transaction.DisposeAsync();
+        }
+
+        //context.Response.OnCompleted(async () =>
+        //{
+        //    try
+        //    {
+        //        if (context.Items.TryGetValue(DomainEventsKey, out var value) && value is Queue<IDomainEvent> domainEvents)
+        //        {
+        //            while (domainEvents.TryDequeue(out var nextEvent))
+        //            {
+        //                await publisher.Publish(nextEvent);
+        //            }
+        //        }
+
+        //        await transaction.CommitAsync();
+        //    }
+        //    catch (EventualConsistencyException e)
+        //    {
+        //        // Handle eventual consistency exceptions
+        //    }
+        //    finally
+        //    {
+        //        await transaction.DisposeAsync();
+        //    }
+        //});
 
         await _next(context);
     }

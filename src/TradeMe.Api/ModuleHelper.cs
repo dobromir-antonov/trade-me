@@ -1,7 +1,7 @@
 ﻿using SharedKernel.Infrastructure;
 using System.Reflection;
 
-namespace Lumina.Api;
+namespace TradeMe.Api;
 
 public static class ModuleHelper
 {

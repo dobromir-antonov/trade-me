@@ -1,4 +1,4 @@
-﻿namespace Lumina.Api.DependencyInjection;
+﻿namespace TradeMe.Api.DependencyInjection;
 
 public static class SwaggerDependencyInjection
 {

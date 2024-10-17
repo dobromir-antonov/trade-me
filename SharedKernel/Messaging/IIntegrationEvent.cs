@@ -1,5 +1,7 @@
-﻿namespace SharedKernel.Messaging;
+﻿using MediatR;
 
-public interface IIntegrationEvent
+namespace SharedKernel.Messaging;
+
+public interface IIntegrationEvent : INotification
 {
 }

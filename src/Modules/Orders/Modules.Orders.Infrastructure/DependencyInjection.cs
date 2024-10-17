@@ -9,18 +9,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Modules.Orders.Application;
-using Modules.Orders.Application.Tickers.TickerPricesChanged;
 using Modules.Orders.Domain.Orders.Abstraction;
 using Modules.Orders.Domain.Tickers.Abstraction;
-using Modules.Orders.Infrastructure.Events;
+using Modules.Orders.Infrastructure.EventualConsistency;
 using Modules.Orders.Infrastructure.Outbox;
 using Modules.Orders.Infrastructure.OutboxWriter;
 using Modules.Orders.Infrastructure.Persistance;
 using Modules.Orders.Infrastructure.Persistance.Repositories;
 using Modules.Orders.Infrastructure.Validation;
-using Modules.Price.IntegrationEvents;
 using SharedKernel.Infrastructure;
-using SharedKernel.Messaging;
 
 namespace Modules.Orders.Infrastructure;
 
@@ -31,7 +28,6 @@ internal static class DependencyInjection
     {
         return services
             .RegisterEndpointVersioning()
-            .RegisterIntegrationEventHandlers()
             .RegisterValidation()
             .RegisterPersistance(configuration)
             .RegisterOutbox()
@@ -40,8 +36,7 @@ internal static class DependencyInjection
 
     public static WebApplication UseOrdersModule(this WebApplication app)
     {
-        // app.UseMiddleware<EventualConsistencyMiddleware>();
-
+        app.UseMiddleware<EventualConsistencyMiddleware>();
         app.MapEndpoints();
 
         if (app.Environment.IsDevelopment())
@@ -62,7 +57,7 @@ internal static class DependencyInjection
 
     private static IServiceCollection RegisterMediator(this IServiceCollection services)
     {
-        return services.AddMediatR(cfg =>
+        services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssemblies(
                 Application.AssemblyReference.Assembly,
@@ -70,6 +65,8 @@ internal static class DependencyInjection
 
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
+
+        return services;
     }
 
     private static IServiceCollection RegisterValidation(this IServiceCollection services)
@@ -96,26 +93,16 @@ internal static class DependencyInjection
 
     private static IServiceCollection RegisterPersistance(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<PublishDomainEventsInterceptor>();
-
         services.AddDbContext<OrdersDbContext>((sp, options) =>
             options
                 .UseNpgsql(
                     configuration.GetConnectionString("Orders"),
-                    cfg => cfg.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schema.DefaultSchema))
-                .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>()));
+                    cfg => cfg.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schema.DefaultSchema)));
 
         services
             .AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<OrdersDbContext>())
             .AddScoped<IOrderRepository, OrderRepository>()
             .AddScoped<ITickerRepository, TickerRepository>();
-
-        return services;
-    }
-
-    private static IServiceCollection RegisterIntegrationEventHandlers(this IServiceCollection services)
-    {
-        services.AddScoped<IIntegrationEventHandler<TickerPricesChangedIntegrationEvent>, TickerPricesChangedIntegrationEventHandler>();
 
         return services;
     }
